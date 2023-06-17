@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    
+    <h1>Chat</h1>
+    <label for="mssg">Message</label>
+    <input type="text" name="mssg" id="message">
+    <input type="submit" value="Submit" id="submit"><br>
+
+    <label for="log">Loggged</label>
+    <textarea name="log" id="log" cols="30" rows="10" readonly></textarea>
+    
+</body>
+<script>
+
+    let message = document.querySelector("#message")
+    let log = document.querySelector("#log")
+    let submit = document.querySelector("#submit")
+
+    let url = `ws://${window.location.host}/chat/`
+    let clientSocket = new WebSocket(url)
+
+    clientSocket.addEventListener("open", (e) => {
+            console.log("WebSocket connection has been established successfully")
+        }
+    )
+
+    clientSocket.addEventListener("message", (e) => {
+
+            let new_data = JSON.parse(e.data)
+            log.value += `${new_data["message"]}`
+
+        }
+    )
+
+    document.addEventListener("keyup", (e) => {
+            if (e.keyCode == 13) {
+
+                submit.click()
+            }
+        }
+    )
+
+    submit.onclick = () => {
+
+        data = {
+            "type": "message",
+            "message": message.value
+        }
+
+        clientSocket.send(JSON.stringify(data))
+        message.value = ""
+
+    }
+
+</script>
+</html>
